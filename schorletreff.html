@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#10151d"><meta name="apple-mobile-web-app-title" content="Schorletreff"><meta name="apple-mobile-web-app-capable" content="yes"><title>Schorletreff</title>
+<style>
+:root{color-scheme:dark;--bg:#0d1219;--panel:#171f2a;--muted:#aab5c5;--line:#303c4d}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;height:100vh;height:100dvh;overflow:hidden;overscroll-behavior:none;background:radial-gradient(ellipse at top,#192433 0,#0d1219 55%);background-color:#0d1219;color:#f7f9fc;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:calc(env(safe-area-inset-top) + 4px) 12px calc(8px + env(safe-area-inset-bottom))}
+.app{max-width:760px;margin:0 auto;height:100%;display:flex;flex-direction:column}
+
+/* Header */
+.top{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:clamp(4px,1.2dvh,12px) 4px clamp(8px,1.8dvh,18px)}
+.brand{font-size:clamp(20px,3.4dvh,28px);font-weight:800;letter-spacing:-.7px;line-height:1.1}
+.sub{color:var(--muted);font-size:clamp(11px,1.6dvh,13px);margin-top:3px}
+.iconbtn{border:1px solid var(--line);background:#19222e;color:#e8edf6;border-radius:14px;width:clamp(38px,5.5dvh,46px);height:clamp(38px,5.5dvh,46px);font-size:clamp(19px,2.8dvh,23px);flex:0 0 auto}
+
+/* Drink grid: fills whatever height is left */
+.grid{--cols:2;flex:1 1 auto;min-height:0;display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:clamp(6px,1.2dvh,12px);overflow-y:auto;overscroll-behavior:contain}
+.item{container-type:size;min-width:0;min-height:0;border:0;border-radius:clamp(14px,2.2dvh,20px);padding:6px 8px;color:white;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;gap:clamp(2px,4cqh,8px);box-shadow:inset 0 1px 0 #ffffff22;touch-action:manipulation;transition:transform .08s;overflow:hidden;user-select:none;-webkit-user-select:none}
+.item:active{transform:scale(.97)}
+.name{font-size:15px;font-size:clamp(12px,min(13cqh,10cqw),20px);font-weight:750;line-height:1.1;overflow-wrap:anywhere}
+.price{font-size:15px;font-size:clamp(12px,min(12cqh,9cqw),19px);font-weight:700;color:#f1f3f8d9}
+.countrow{--b:38px;--b:clamp(28px,min(30cqh,24cqw),44px);display:flex;align-items:center;justify-content:space-between;gap:2px;width:100%;max-width:210px;min-width:0;background:#07101975;border-radius:999px;padding:3px 4px;overflow:hidden}
+.count{flex:1;text-align:center;font-size:16px;font-size:calc(var(--b)*.42);font-weight:800;min-width:20px}
+.plus,.minus{width:var(--b);height:var(--b);flex:0 0 var(--b);font-size:calc(var(--b)*.66);line-height:1;padding:0;font-weight:400;border:0;border-radius:50%;background:#ffffff19;color:white;touch-action:manipulation}
+.minus:disabled{opacity:.4}
+
+/* Pfand: full width bar, always at the bottom of the grid */
+.item.pfand{order:1;grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(130px,.8fr);grid-template-rows:auto auto;gap:2px 14px;padding:6px 14px}
+.item.pfand .name{grid-column:1;grid-row:1;align-self:end;text-align:left;font-size:clamp(13px,min(22cqh,5cqw),19px)}
+.item.pfand .price{grid-column:1;grid-row:2;align-self:start;text-align:left;font-size:clamp(12px,min(20cqh,4.5cqw),18px)}
+.item.pfand .countrow{grid-column:2;grid-row:1/3;align-self:center;justify-self:end;--b:clamp(28px,52cqh,44px)}
+.empty{grid-column:1/-1;color:var(--muted);padding:30px 10px;text-align:center}
+
+/* Total */
+.totalbox{flex:0 0 auto;margin-top:clamp(8px,1.6dvh,16px)}
+.totalcard{background:linear-gradient(135deg,#1a2431,#121923);border:1px solid #293444;border-radius:clamp(16px,2.4dvh,22px);padding:clamp(10px,1.8dvh,17px) clamp(12px,2dvh,17px)}
+.label{font-size:clamp(10px,1.5dvh,12px);color:var(--muted);font-weight:800;letter-spacing:1.5px}
+.amount{font-size:clamp(26px,min(10vw,5.8dvh),48px);font-weight:850;letter-spacing:-1.5px;line-height:1.1}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:clamp(8px,1.4dvh,14px)}
+.action{border:1px solid #3a475a;background:#1a2431;color:#eef3fb;border-radius:13px;min-height:clamp(40px,6.2dvh,54px);font-size:clamp(14px,2dvh,17px);font-weight:700}
+.undobtn{width:100%;min-width:0;font-weight:800;display:flex;align-items:center;justify-content:center;gap:9px}
+.action:disabled{opacity:.35}
+.hint{text-align:center;color:#8592a5;font-size:11px;margin:clamp(4px,1dvh,10px) 0 0}
+
+/* Settings sheet (scrolls on its own) */
+.overlay{position:fixed;inset:0;background:#0009;display:none;align-items:flex-end;justify-content:center;padding:12px;padding-bottom:calc(12px + env(safe-area-inset-bottom));z-index:5}
+.overlay.open{display:flex}
+.sheet{width:100%;max-width:600px;max-height:88dvh;overflow:auto;background:#151e29;border:1px solid #354254;border-radius:24px;padding:20px}
+.sheethead{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.sheet h2{font-size:21px;margin:0}
+.close{background:#293444;color:white;border:0;border-radius:10px;padding:9px 12px}
+.field{display:grid;grid-template-columns:1fr 88px 36px;gap:7px;align-items:center;margin:9px 0}
+.field input{min-width:0;width:100%;background:#0e151e;color:white;border:1px solid #3a4758;border-radius:10px;padding:11px 8px;font-size:16px}
+.remove{border:0;border-radius:9px;background:#492b36;color:#ffc6d0;height:39px;font-size:18px}
+.sheetactions{display:flex;gap:8px;margin-top:16px}
+.sheetactions button{flex:1;padding:12px;border-radius:12px;font-weight:750;border:1px solid #46556a;background:#253244;color:white}
+.sheetactions .primary{background:#d9e7ff;color:#111b29;border:0}
+.smallnote{font-size:12px;line-height:1.45;color:#aab5c5;margin:12px 0}
+
+@media(min-width:421px){.grid{--cols:3}body{padding-left:16px;padding-right:16px}}
+@media(max-height:640px){.sub,.hint{display:none}}
+</style></head><body><main class="app"><header class="top"><div><div class="brand">Schorletreff</div><div class="sub">Tap a drink to add it to your tab</div></div><button class="iconbtn" id="settings" aria-label="Edit items">⚙</button></header><section class="grid" id="grid"></section><section class="totalbox"><div class="totalcard"><div class="label">TOTAL</div><div class="amount" id="total">€0.00</div><div class="actions"><button class="action" id="reset">Reset tab</button><button class="action undobtn" id="undo" aria-label="Undo last tap" title="Undo last tap"><span aria-hidden="true">↶</span><span>Undo</span></button></div></div><p class="hint">Your tab stays on this device if you close the page.</p></section></main>
+<div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-label="Edit items"><div class="sheet"><div class="sheethead"><h2>Customize buttons</h2><button class="close" id="close">Done ✕</button></div><p class="smallnote">Set up your usual drinks here. After that, using the tab is just tapping buttons. Changes are saved on this device.</p><div id="fields"></div><div class="sheetactions"><button id="add">＋ Add item</button><button class="primary" id="save">Save buttons</button></div><p class="smallnote">Use short names so the buttons stay easy to tap.</p></div></div>
+<script>
+const defaults=[{name:'Rieslingschorle',price:4.5,color:'#a98212'},{name:'Weißherbstschorle',price:4.5,color:'#167455'},{name:'Bellheimer Pils',price:3,color:'#b52f49'},{name:'Traubensaftschorle',price:3.5,color:'#2475b8'},{name:'Glas Wasser',price:1.5,color:'#7042a0'},{name:'Flasche Wasser',price:2.5,color:'#137b87'},{name:'Pfand',price:4,color:'#526273'}];
+const $=id=>document.getElementById(id);let items=[],history=[];
+const isPfand=x=>String(x.name).trim().toLowerCase()==='pfand';
+function load(){try{const saved=JSON.parse(localStorage.getItem('bartab.items.v2'));items=Array.isArray(saved)&&saved.length?saved:defaults.map(x=>({...x,count:0}));}catch{items=defaults.map(x=>({...x,count:0}));}items=items.map(x=>({...x,count:Number(x.count)||0,price:Number(x.price)||0}));if(!items.some(isPfand))items.push({...defaults[6],count:0});}
+function persist(){try{localStorage.setItem('bartab.items.v2',JSON.stringify(items));}catch{}}
+function money(n){return new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(n)}
+function total(){return items.reduce((s,x)=>s+x.price*x.count,0)}
+/* Split the available height into equal rows for the drinks plus a slimmer row for Pfand */
+function layout(){const g=$('grid');const cols=parseInt(getComputedStyle(g).getPropertyValue('--cols'))||2;const normal=items.filter(x=>!isPfand(x)).length;const hasP=normal!==items.length;const rows=Math.ceil(normal/cols);let t=rows?`repeat(${rows},minmax(64px,1fr))`:'';if(hasP)t+=' minmax(52px,.55fr)';g.style.gridTemplateRows=t.trim()||'1fr';}
+function render(){const grid=$('grid');grid.innerHTML='';if(!items.length)grid.innerHTML='<div class="empty">Add items in ⚙ settings to get started.</div>';items.forEach((it,i)=>{const card=document.createElement('div');card.className='item'+(isPfand(it)?' pfand':'');card.style.background=`linear-gradient(145deg,${it.color||'#34465b'},${it.color||'#34465b'}cc)`;card.setAttribute('role','group');card.setAttribute('aria-label',`${it.name}, ${money(it.price)}`);card.innerHTML=`<span class="name">${esc(it.name)}</span><span class="price">${money(it.price)}</span><span class="countrow"><button class="minus" aria-label="Remove one ${esc(it.name)}" ${it.count<=0?'disabled':''}>−</button><span class="count">${it.count}</span><button class="plus" aria-label="Add one ${esc(it.name)}">+</button></span>`;const change=delta=>{if(delta<0&&items[i].count<=0)return;history.push(items.map(x=>({...x})));items[i].count+=delta;persist();render()};card.addEventListener('click',e=>{if(e.target.closest('.countrow'))return;change(1)});card.querySelector('.plus').addEventListener('click',e=>{e.stopPropagation();change(1)});card.querySelector('.minus').addEventListener('click',e=>{e.stopPropagation();change(-1)});grid.appendChild(card)});layout();$('total').textContent=money(total());$('undo').disabled=!history.length;}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function showSettings(){const f=$('fields');f.innerHTML='';items.forEach((it,i)=>{const row=document.createElement('div');row.className='field';row.innerHTML=`<input aria-label="Item name" data-k="name" placeholder="Name" value="${esc(it.name)}"><input aria-label="Price in euros" data-k="price" type="number" min="0" step="0.5" placeholder="€" value="${it.price}"><button class="remove" aria-label="Remove item">×</button>`;row.querySelector('.remove').onclick=()=>{items.splice(i,1);showSettings()};f.appendChild(row)});$('overlay').classList.add('open')}
+$('settings').onclick=showSettings;$('close').onclick=()=>$('overlay').classList.remove('open');$('overlay').addEventListener('click',e=>{if(e.target===$('overlay'))$('overlay').classList.remove('open')});$('add').onclick=()=>{items.push({name:'New item',price:1,color:defaults[items.length%defaults.length].color,count:0});showSettings()};$('save').onclick=()=>{const rows=[...$('fields').children];items=rows.map((row,i)=>{const old=items[i]||{};const get=k=>row.querySelector(`[data-k="${k}"]`).value;return {...old,name:get('name').trim()||'Item',price:Math.max(0,Number(get('price'))||0),color:old.color||defaults[i%defaults.length].color,count:old.count||0}});history=[];persist();render();$('overlay').classList.remove('open')};$('undo').onclick=()=>{if(history.length){items=history.pop();persist();render()}};$('reset').onclick=()=>{if(items.some(x=>x.count)){history.push(items.map(x=>({...x})));items=items.map(x=>({...x,count:0}));persist();render()}};
+addEventListener('resize',layout);addEventListener('orientationchange',()=>setTimeout(layout,150));
+load();render();
+</script></body></html>
